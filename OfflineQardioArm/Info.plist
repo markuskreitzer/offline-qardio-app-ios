@@ -2,11 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>HKQuantityTypeIdentifierBloodPressureDiastolic</key>
-	<string>Required to store the diastolic bood pressure reading</string>
-	<key>HKQuantityTypeIdentifierBloodPressureSystolic</key>
-	<string>Required to store the systolic bood pressure reading</string>
-	<key>HKQuantityTypeIdentifierHeartRate</key>
-	<string>Required to store the heart rate reading</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>OfflineQardioArm reads your blood pressure and heart rate from Apple Health to display your history alongside new readings.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>OfflineQardioArm saves your blood pressure and heart rate readings from your QardioArm device to Apple Health.</string>
 </dict>
 </plist>

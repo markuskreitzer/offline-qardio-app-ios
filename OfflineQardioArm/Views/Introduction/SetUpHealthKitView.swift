@@ -49,9 +49,8 @@ struct SetUpHealthKitView: View {
                     }.foregroundColor(.red)
                     Spacer()
                     Button(action:{
-                        Task() {
-                            try await healthKitController.requestAuthorization()
-                            _ = healthKitController.isAuthorized()
+                        Task {
+                            try? await healthKitController.requestAuthorization()
                         }
                     }) {
                         Text("Allow")

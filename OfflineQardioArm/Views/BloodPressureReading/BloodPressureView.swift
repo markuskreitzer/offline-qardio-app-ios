@@ -11,7 +11,9 @@ struct BloodPressureView : View {
     
     private func onSuccessfulReading(_ bloodPressureReading: BloodPressureReading) {
         if (saveToHealthKit) {
-           _ = healthKitController.saveBloodPressureReading(reading: bloodPressureReading)
+            Task {
+                _ = await healthKitController.saveBloodPressureReading(reading: bloodPressureReading)
+            }
         }
     }
 
@@ -62,16 +64,22 @@ struct BloodPressureView : View {
                                 showingReadingOptions = true
                             }.sheet(isPresented: $presentSingleBloodPressureReading) {
                                 if (saveToHealthKit) {
-                                    _ = healthKitController.saveBloodPressureReading(reading: bluetoothController.bloodPressureReading)
+                                    let reading = bluetoothController.bloodPressureReading
+                                    Task {
+                                        _ = await healthKitController.saveBloodPressureReading(reading: reading)
+                                    }
                                 }
                             } content: {
                                 BloodPressureReadingInActionView()
                             }
                             .sheet(isPresented: $presentAverageBloodPressureReading) {
                                 if (saveToHealthKit && averageBloodPressureCoordinator.hasReadings) {
-                                    _ = healthKitController.saveBloodPressureReading(reading: bluetoothController.bloodPressureReading)
+                                    let reading = bluetoothController.bloodPressureReading
+                                    Task {
+                                        _ = await healthKitController.saveBloodPressureReading(reading: reading)
+                                    }
                                 }
-                                
+
                             } content: {
                                 AverageBloodPressureReadingInActionView()
                             }

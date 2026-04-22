@@ -10,11 +10,12 @@ import HealthKitUI
 import Foundation
 
 struct HealthKitStatusView: View {
-    
+
     @ObservedObject private var healthKitController = HealthKitController.shared
     var reading: BloodPressureReading
     @State private var healthKitError: String?
-    
+    @State private var didSave = false
+
     @State var authenticated = false
     @State var trigger = false
 
@@ -47,9 +48,8 @@ struct HealthKitStatusView: View {
             Spacer()
             if (!healthKitController.healthDataAuthorized) {
                 Button(action: {
-                    Task() {
-                        try await healthKitController.requestAuthorization()
-                        _ = healthKitController.isAuthorized()
+                    Task {
+                        try? await healthKitController.requestAuthorization()
                     }
                 }) {
                     Text("Authenticate HealthKit")
@@ -57,17 +57,27 @@ struct HealthKitStatusView: View {
                         .foregroundColor(.blue)
                 }
             } else {
-                if (reading.bloodPressureReadingProgress == .completed) {
+                if (reading.bloodPressureReadingProgress == .completed && !didSave && !reading.syncedToHealth) {
                     Button(action: {
-                        _ = healthKitController.saveBloodPressureReading(reading: reading)
-                    })
-                    {
-                        if(!reading.syncedToHealth) {
-                            Text("Save to HealthKit")
-                                .font(.subheadline)
-                                .foregroundColor(.blue)
+                        Task {
+                            let success = await healthKitController.saveBloodPressureReading(reading: reading)
+                            await MainActor.run {
+                                if success {
+                                    didSave = true
+                                } else {
+                                    healthKitError = healthKitController.lastSaveError ?? "Save failed"
+                                }
+                            }
                         }
+                    }) {
+                        Text("Save to HealthKit")
+                            .font(.subheadline)
+                            .foregroundColor(.blue)
                     }
+                } else if didSave || reading.syncedToHealth {
+                    Text("Saved")
+                        .font(.subheadline)
+                        .foregroundColor(.green)
                 }
             }
         }

@@ -46,9 +46,12 @@ struct HealthAppAuthorisationStatusView: View {
             HStack {
                 if !healthKitController.healthDataAuthorized {
                     Button(action: {
-                        Task() {
-                            try await healthKitController.requestAuthorization()
-                            _ = healthKitController.isAuthorized()
+                        Task {
+                            do {
+                                try await healthKitController.requestAuthorization()
+                            } catch {
+                                healthKitError = error.localizedDescription
+                            }
                         }
                     }) {
                         Text("Allow")
