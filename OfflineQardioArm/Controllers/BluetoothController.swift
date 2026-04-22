@@ -318,20 +318,28 @@ class BluetoothController: NSObject, ObservableObject, CBCentralManagerDelegate,
             logger.debug("Reading from connected peripheral: \(self.connectedPeripheral?.name ?? "Unknown")")
             logger.trace("Peripheral Identifier: \(self.connectedPeripheral?.identifier.uuidString ?? "Unknown")")
             logger.trace("Is Connected? \(self.connectedPeripheral?.state == .connected ? "Yes" : "No")")
-            
+
             logger.trace("Writing value to characteristic: \(String(describing: self.characteristic?.uuid))")
+            guard let characteristic = self.characteristic, let peripheral = self.connectedPeripheral else {
+                logger.warning("Start reading requested but control characteristic not yet discovered.")
+                return
+            }
             self.onSuccessfulReading = onSuccessfulReading
             bloodPressureReading.bloodPressureReadingProgress = .started
-            connectedPeripheral?.writeValue(hexToData(QardioArmBluetoothDevice.bloodPressureFeatureStartReadingValue, bigEndian: false), for: self.characteristic!, type: .withResponse)
+            peripheral.writeValue(hexToData(QardioArmBluetoothDevice.bloodPressureFeatureStartReadingValue, bigEndian: false), for: characteristic, type: .withResponse)
         } else {
             logger.warning("No connected peripheral to read from.")
         }
     }
-    
+
     func stopReading() {
         if self.isDeviceConnected() {
             logger.debug("Stopping reading from connected peripheral: \(self.connectedPeripheral?.name ?? "Unknown")")
-            connectedPeripheral?.writeValue(hexToData(QardioArmBluetoothDevice.bloodPressureFeatureStopReadingValue, bigEndian: false), for: self.characteristic!, type: .withResponse)
+            guard let characteristic = self.characteristic, let peripheral = self.connectedPeripheral else {
+                logger.warning("Stop reading requested but control characteristic not yet discovered.")
+                return
+            }
+            peripheral.writeValue(hexToData(QardioArmBluetoothDevice.bloodPressureFeatureStopReadingValue, bigEndian: false), for: characteristic, type: .withResponse)
             bloodPressureReading.bloodPressureReadingProgress = .notStarted
         }
     }
@@ -431,22 +439,22 @@ class BluetoothController: NSObject, ObservableObject, CBCentralManagerDelegate,
         switch central.state {
         case .unauthorized:
             isBluetoothEnabled = false
-            break
         case .unknown:
-            break
+            isBluetoothEnabled = false
         case .unsupported:
-            break
+            isBluetoothEnabled = false
         case .poweredOn:
             isBluetoothEnabled = true
             scanForPeripherals()
-            break
         case .poweredOff:
+            isBluetoothEnabled = false
             self.connectedPeripheral = nil
-            break
+            self.characteristic = nil
         case .resetting:
+            isBluetoothEnabled = false
             self.connectedPeripheral = nil
-            break
-        default:
+            self.characteristic = nil
+        @unknown default:
             isBluetoothEnabled = false
         }
     }

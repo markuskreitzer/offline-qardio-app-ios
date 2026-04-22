@@ -6,5 +6,7 @@
 	<string>OfflineQardioArm reads your blood pressure and heart rate from Apple Health to display your history alongside new readings.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>OfflineQardioArm saves your blood pressure and heart rate readings from your QardioArm device to Apple Health.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>OfflineQardioArm uses Bluetooth to connect directly to your QardioArm blood pressure monitor without going through the vendor's servers.</string>
 </dict>
 </plist>
