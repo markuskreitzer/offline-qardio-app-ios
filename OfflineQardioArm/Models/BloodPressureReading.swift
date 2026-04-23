@@ -15,6 +15,7 @@ struct BloodPressureReading : Identifiable, Hashable {
     var pulseRate: UInt16
     var bloodPressureReadingProgress: BloodPressureReadingProgress
     var syncedToHealth: Bool = false
+    var date: Date = Date()
 }
 
 extension BloodPressureReading {
@@ -27,6 +28,55 @@ extension BloodPressureReading {
             BloodPressureReading(systolic: 125, diastolic: 82, atrialPressure: 92, pulseRate: 68, bloodPressureReadingProgress: .savedToHealthKit)
         ]
     }
+}
+
+enum BloodPressureCategory {
+    case none
+    case low
+    case normal
+    case elevated
+    case stage1
+    case stage2
+    case crisis
+
+    var label: String {
+        switch self {
+        case .none: return "—"
+        case .low: return "Low"
+        case .normal: return "Normal"
+        case .elevated: return "Elevated"
+        case .stage1: return "Stage 1"
+        case .stage2: return "Stage 2"
+        case .crisis: return "Crisis"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .none: return .secondary
+        case .low: return .blue
+        case .normal: return .green
+        case .elevated: return .yellow
+        case .stage1: return .orange
+        case .stage2: return .red
+        case .crisis: return .pink
+        }
+    }
+}
+
+extension BloodPressureReading {
+    var category: BloodPressureCategory {
+        let s = Int(systolic), d = Int(diastolic)
+        if s == 0 || d == 0 { return .none }
+        if s >= 180 || d >= 120 { return .crisis }
+        if s >= 140 || d >= 90 { return .stage2 }
+        if s >= 130 || d >= 80 { return .stage1 }
+        if s >= 120 { return .elevated }
+        if s < 90 || d < 60 { return .low }
+        return .normal
+    }
+
+    var hasReading: Bool { systolic > 0 && diastolic > 0 }
 }
 
 enum BloodPressureReadingProgress {

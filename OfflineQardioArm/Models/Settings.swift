@@ -7,5 +7,5 @@
 
 struct Settings {
     static let saveToHealthKit: String = "saveToHealthKit"
-    
+    static let confirmBeforeSave: String = "confirmBeforeSave"
 }

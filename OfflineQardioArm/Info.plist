@@ -2,11 +2,47 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>HKQuantityTypeIdentifierBloodPressureDiastolic</key>
-	<string>Required to store the diastolic bood pressure reading</string>
-	<key>HKQuantityTypeIdentifierBloodPressureSystolic</key>
-	<string>Required to store the systolic bood pressure reading</string>
-	<key>HKQuantityTypeIdentifierHeartRate</key>
-	<string>Required to store the heart rate reading</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>QardioArm BP</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>QardioArm BP</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to connect to your QardioArm blood pressure monitor.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Used to connect to your QardioArm blood pressure monitor.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Used to read your blood pressure history from Apple Health.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Used to save blood pressure readings to Apple Health.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string></string>
+	</dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 </dict>
 </plist>

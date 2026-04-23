@@ -83,6 +83,65 @@ class HealthKitController : ObservableObject {
         //        return true
     }
     
+    func fetchBloodPressureHistory(start: Date? = nil, end: Date? = nil) async throws -> [BloodPressureReading] {
+        let healthStore = HealthKitController.healthStore
+        guard let bloodPressureType = HKObjectType.correlationType(forIdentifier: .bloodPressure) else {
+            return []
+        }
+        let systolicType = HKQuantityType.quantityType(forIdentifier: .bloodPressureSystolic)!
+        let diastolicType = HKQuantityType.quantityType(forIdentifier: .bloodPressureDiastolic)!
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+        let mmHg = HKUnit.millimeterOfMercury()
+        let bpm = HKUnit.count().unitDivided(by: HKUnit.minute())
+
+        let predicate = (start != nil || end != nil)
+            ? HKQuery.predicateForSamples(withStart: start, end: end, options: [])
+            : nil
+        let sort = [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)]
+
+        let correlations: [HKCorrelation] = try await withCheckedThrowingContinuation { cont in
+            let query = HKSampleQuery(sampleType: bloodPressureType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: sort) { _, samples, error in
+                if let error = error { cont.resume(throwing: error); return }
+                cont.resume(returning: (samples as? [HKCorrelation]) ?? [])
+            }
+            healthStore.execute(query)
+        }
+
+        let heartRates: [HKQuantitySample] = try await withCheckedThrowingContinuation { cont in
+            let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: sort) { _, samples, error in
+                if let error = error { cont.resume(throwing: error); return }
+                cont.resume(returning: (samples as? [HKQuantitySample]) ?? [])
+            }
+            healthStore.execute(query)
+        }
+
+        return correlations.compactMap { correlation -> BloodPressureReading? in
+            guard
+                let sys = correlation.objects(for: systolicType).first as? HKQuantitySample,
+                let dia = correlation.objects(for: diastolicType).first as? HKQuantitySample
+            else { return nil }
+            let nearestHR = heartRates.min(by: {
+                abs($0.startDate.timeIntervalSince(correlation.startDate)) < abs($1.startDate.timeIntervalSince(correlation.startDate))
+            })
+            let pulse: UInt16
+            if let hr = nearestHR,
+               abs(hr.startDate.timeIntervalSince(correlation.startDate)) < 60 {
+                pulse = UInt16(hr.quantity.doubleValue(for: bpm).rounded())
+            } else {
+                pulse = 0
+            }
+            return BloodPressureReading(
+                systolic: UInt16(sys.quantity.doubleValue(for: mmHg).rounded()),
+                diastolic: UInt16(dia.quantity.doubleValue(for: mmHg).rounded()),
+                atrialPressure: 0,
+                pulseRate: pulse,
+                bloodPressureReadingProgress: .savedToHealthKit,
+                syncedToHealth: true,
+                date: correlation.startDate
+            )
+        }
+    }
+
     func isAuthorized() -> Bool {
         // Check if the user has granted permission to access HealthKit data.
         
@@ -100,7 +159,8 @@ class HealthKitController : ObservableObject {
             if HKHealthStore.isHealthDataAvailable() {
                 
                 // Asynchronously request authorization to the data.
-                try await HealthKitController.healthStore.requestAuthorization(toShare: HealthKitController.allTypes, read: [])
+                try await HealthKitController.healthStore.requestAuthorization(toShare: HealthKitController.allTypes, read: HealthKitController.allTypes)
+                self.healthDataAuthorized = self.isAuthorized()
                 
             }
         } catch {

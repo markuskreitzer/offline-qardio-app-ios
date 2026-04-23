@@ -20,7 +20,14 @@ struct ContentView: View {
         if (!tutorialCompleted) {
             TutorialView()
         } else {
-            BloodPressureView(bluetoothController: self.bluetoothController, healthKitController: self.healthKitController)
+            TabView {
+                BloodPressureView(bluetoothController: self.bluetoothController, healthKitController: self.healthKitController)
+                    .tabItem { Label("Reading", systemImage: "heart.fill") }
+                HistoryView(healthKitController: self.healthKitController)
+                    .tabItem { Label("History", systemImage: "chart.xyaxis.line") }
+                NavigationStack { SettingsView() }
+                    .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+            }
             .onChange(of: scenePhase) { oldPhase, newPhase in
                 if newPhase == .active {
                     print("Active")

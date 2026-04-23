@@ -1,0 +1,54 @@
+name: OfflineQardioArm
+options:
+  bundleIdPrefix: com.nostoslabs
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_PREVIEWS: YES
+
+targets:
+  OfflineQardioArm:
+    type: application
+    platform: iOS
+    sources:
+      - path: OfflineQardioArm
+        excludes:
+          - "Info.plist"
+          - "OfflineQardioArm.entitlements"
+    resources:
+      - OfflineQardioArm/Assets.xcassets
+    info:
+      path: OfflineQardioArm/Info.plist
+      properties:
+        CFBundleDisplayName: QardioArm BP
+        CFBundleName: QardioArm BP
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: ""
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSBluetoothAlwaysUsageDescription: Used to connect to your QardioArm blood pressure monitor.
+        NSBluetoothPeripheralUsageDescription: Used to connect to your QardioArm blood pressure monitor.
+        NSHealthShareUsageDescription: Used to read your blood pressure history from Apple Health.
+        NSHealthUpdateUsageDescription: Used to save blood pressure readings to Apple Health.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nostoslabs.OfflineQardioArm
+        INFOPLIST_FILE: OfflineQardioArm/Info.plist
+        CODE_SIGN_ENTITLEMENTS: OfflineQardioArm/OfflineQardioArm.entitlements
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+        GENERATE_INFOPLIST_FILE: NO
