@@ -105,3 +105,5 @@ iOSInjectionProject/
 
 # macOS
 .DS_Store
+# Claude Code local config
+.claude/
